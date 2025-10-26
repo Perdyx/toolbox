@@ -1,0 +1,77 @@
+name: toolbox
+
+volumes:
+  ollama_data:
+  owui_data:
+
+services:
+  vpn:
+    image: qmcgaw/gluetun
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - "6901:22"
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - TZ=UTC
+      - VPN_SERVICE_PROVIDER=protonvpn
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=$WIREGUARD_PRIVATE_KEY
+      - SERVER_COUNTRIES=Canada,Japan,Netherlands,Norway,Poland,Romania,Singapore,United States
+      - FREE_ONLY=true
+    healthcheck:
+      test: ping -c 1 1.1.1.1 || exit 1
+      interval: 20s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  kali:
+    image: tbx-kali:latest
+    depends_on:
+      vpn:
+        condition: service_healthy
+    network_mode: "service:vpn"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    environment:
+      - ROOT_PASSWORD=$ROOT_PASSWORD
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama
+    depends_on:
+      - kali
+    expose:
+      - 11434/tcp
+    ports:
+      - 11434:11434/tcp
+    healthcheck:
+      test: ollama --version || exit 1
+    volumes:
+      - ollama_data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    runtime: nvidia
+    restart: unless-stopped
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    depends_on:
+      - ollama
+    ports:
+      - 3000:8080/tcp
+    volumes:
+      - owui_data:/app/backend/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
