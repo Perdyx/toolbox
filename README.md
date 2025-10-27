@@ -1,4 +1,4 @@
-# Silverhand
+# Toolbox
 
 This is just a simple Docker compose file to host Open Web UI and Ollama alongside a customized Kali Linux container routed through ProtonVPN (WireGuard).
 
@@ -6,7 +6,7 @@ This is just a simple Docker compose file to host Open Web UI and Ollama alongsi
 
 Build the custom Kali image:
 
-`$ docker build -t silverhand-kali:latest ./kali`
+`$ ./build.sh`
 
 Create a file called `.env` next to `docker-compose.yaml` and configure the following inside it:
 
