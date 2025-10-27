@@ -38,6 +38,8 @@ services:
       - NET_RAW
     environment:
       - ROOT_PASSWORD=$ROOT_PASSWORD
+    volumes:
+      - ./vault:/root/vault:z # Can apparently brick host system if :z/:Z suffix is present on certain paths used in bind mounts
     stdin_open: true
     tty: true
     restart: unless-stopped
