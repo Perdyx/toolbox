@@ -39,7 +39,7 @@ services:
     environment:
       - ROOT_PASSWORD=$ROOT_PASSWORD
     volumes:
-      - ./vault:/root/vault:z # Can apparently brick host system if :z/:Z suffix is present on certain paths used in bind mounts
+      - ./data/vault:/root/vault:z # Can apparently brick host system if :z/:Z suffix is present on certain paths used in bind mounts
     stdin_open: true
     tty: true
     restart: unless-stopped
@@ -55,7 +55,7 @@ services:
     healthcheck:
       test: ollama --version || exit 1
     volumes:
-      - ollama_data:/root/.ollama
+      - ./data/ollama:/root/.ollama:z
     deploy:
       resources:
         reservations:
@@ -73,7 +73,7 @@ services:
     ports:
       - 3000:8080/tcp
     volumes:
-      - owui_data:/app/backend/data
+      - ./data/owui:/app/backend/data:z
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
