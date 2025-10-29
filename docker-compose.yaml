@@ -39,7 +39,7 @@ services:
     environment:
       - ROOT_PASSWORD=$ROOT_PASSWORD
     volumes:
-      - ./data/vault:/root/vault
+      - ./vault:/root/vault:z
     stdin_open: true
     tty: true
     restart: unless-stopped
@@ -55,7 +55,7 @@ services:
     healthcheck:
       test: ollama --version || exit 1
     volumes:
-      - ./data/ollama:/root/.ollama
+      - ollama_data:/root/.ollama
     deploy:
       resources:
         reservations:
@@ -73,7 +73,7 @@ services:
     ports:
       - 3000:8080/tcp
     volumes:
-      - ./data/owui:/app/backend/data
+      - owui_data:/app/backend/data
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
