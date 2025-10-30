@@ -33,8 +33,7 @@ RUN apt upgrade -y
 # Install tmux
 RUN apt-get install -y --no-install-recommends tmux
 
-# Add banner file and display with welcome message on tmux shell startup
-COPY ./config/banner.txt /root/.motd.txt
+# Display welcome message on tmux shell startup
 RUN cat >> /root/.bashrc <<'EOF'
 ########## Tmux startup script ##########
 GREEN=$'\e[1;32m'
@@ -49,21 +48,12 @@ if [[ -z "$TMUX" ]] && [[ -n "$PS1" ]] && [[ "$(tty)" == "/dev/pts/"* ]]; then
 fi
 
 if [[ -n "$TMUX" && $- == *i* ]]; then
-    # Display banner
-    cat .motd.txt
-    echo -e "\n\n"
-
-    # List network connections
-    lsof -i -nP | grep -E 'LISTEN|ESTABLISHED'
-
     # Display connection info
     # echo -e "\n[${GREEN} $(curl -s ipinfo.io/ip) ${RESET}] - $(curl -s ipinfo.io/org)"
     # echo -e "$(curl -s ipinfo.io/city), $(curl -s ipinfo.io/region), $(curl -s ipinfo.io/country)\n"
 		
-		echo
 		tmux ls
-
-    echo "Happy hacking!"
+    echo -e "\nHappy hacking!"
 fi
 EOF
 
